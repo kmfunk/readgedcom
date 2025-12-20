@@ -63,7 +63,7 @@ The input file should be UTF-8, not ANSEL
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v2.3
+v2.3.1
 """
 
 import sys
@@ -216,9 +216,9 @@ PRIVATIZE_MAX = PRIVATIZE_MIN + 1
 SELF_CONSISTENCY_CHECKS = True
 SELF_CONSISTENCY_ERR = 'Program code inconsistency:'
 
-# complain or threw exception for years outside these,
+# complain or throw exception for years outside these,
 # but can be over-ridden with extend-years option
-min_valid_year = 1100
+min_valid_year = 900
 max_valid_year = 2100
 
 # The detected version of the input file. Treat as a global.
@@ -340,10 +340,12 @@ def convert_to_unicode( s ):
 def convert_to_html( s ):
     """ Convert common utf-8 encoded characters to html for the various display of names etc."""
     # https://dev.w3.org/html5/html-author/charref
+    # using numeric entities rather than symbolic because
+    # graphviz/dot doesn't like &apos; for instance
     text = s.strip()
-    text = text.replace('&','&smp;').replace('<','&lt;').replace('>','&gt;' )
-    text = text.replace('"','&quot;').replace("'",'&apos;')
-    text = text.replace('`','&#96;').replace('\\','&bsol;')
+    text = text.replace('&','&#38;').replace('<','&#60;').replace('>','&#62;' )
+    text = text.replace('"','&#34;').replace("'",'&#39;')
+    text = text.replace('`','&#96;').replace('\\','&#92;')
     # encode generates a byte array, decode goes back to a string
     text = text.encode( 'ascii', 'xmlcharrefreplace' ).decode( 'ascii' )
     return text
@@ -982,6 +984,8 @@ def date_to_comparable( original ):
     if the crash_on_bad_date flag is True (default False).
 
     ValueError is thrown for a non-gregorian calendar.
+
+    Allow 3 digit years, but zero fill to 0yyy
     """
 
     # examples:
